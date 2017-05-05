@@ -1,0 +1,39 @@
+OpenNms
+-	Used to monitor routers, servers and other network devices
+-	Configuration for alerts on status changes or performance issues
+-	Used to create network topology
+-	Installated with below steps on ubuntu server
+o	Create a new apt source file 
+(eg: /etc/apt/sources.list.d/opennms.list)
+Package repository configuration for Debian-based systems
+deb https://debian.opennms.org stable main 
+deb-src https://debian.opennms.org stable main
+o	GPG key import for Debian-based systems
+wget -O - https://debian.opennms.org/OPENNMS-GPG-KEY | apt-key add -
+o	Install Opennms
+apt-get update
+apt-get install -y opennms
+tree -L 2
+o	Prepare PostgreSQL
+service postgresql start
+su - postgres
+createuser -P opennms
+createdb -O opennms opennms
+exit
+su - postgres
+psql -c "ALTER USER postgres WITH PASSWORD 'YOUR-POSTGRES-PASSWORD';"
+exit
+o	Set username and password for OpenNms database table and postgres user for administrative access to Postgre SQL
+vi ${OPENNMS_HOME}/etc/opennms-datasources.xml
+o	Initialize OpenNms
+${OPENNMS_HOME}/bin/runjava -s
+${OPENNMS_HOME}/bin/install -dis
+service opennms start
+-	Once Started access the web application through the following link:
+http://<ip-or-fqdn-of-your-server>:8980/opennms
+The default login user is admin and the password is initialized to admin.
+-	Once in the web UI you can discover network devices by pinging the devices using automatic discovery
+-	Once devices discovered you can configure the type of device and check if monitoring is enabled
+-	You can activate alerts if monitoring is working
+-	Network topology can by setup by going to maps tab and then selecting the servers and other devices to be included in the topology
+-	If unable to detect devices through automatic discovery, Manual discovery can be utilized by using the option quick add nodes
